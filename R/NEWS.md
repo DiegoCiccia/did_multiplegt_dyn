@@ -21,3 +21,9 @@ First official R release.
 ## Changes in version 1.0.4
 
 + Fixed bugs for unbalanced panels.
+
+## Changes in version 1.0.5
+
++ Added option to compute bootstrap standard errors
+
++ Fixed minor bugs
