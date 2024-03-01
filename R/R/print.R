@@ -53,9 +53,12 @@ print.did_multiplegt_dyn <- function(x, ...) {
             cat(strrep(" ", 4));cat(" Testing the parallel trends and no anticipation assumptions");cat("\n");
             cat(noquote(strrep("-", 70)));cat("\n");
             mat_print(ref$results$Placebos)
+            if (is.null(x$args$bootstrap)) {
+                cat("\n")
+                cat(sprintf("Test of joint nullity of the placebos : p-value = %.4f", ref$results$p_jointplacebo))
+                cat("\n")
+            }
             cat("\n")
-            cat(sprintf("Test of joint nullity of the placebos : p-value = %.4f", ref$results$p_jointplacebo))
-            cat("\n");cat("\n")
         }
 
         if (!is.null(ref$design)) {
