@@ -23,6 +23,7 @@
 #' @param trends_lin trends_lin
 #' @param less_conservative_se less_conservative_se
 #' @param continuous continuous
+#' @param data_only data_only
 #' @import dplyr
 #' @importFrom matlib Ginv 
 #' @importFrom plm pdata.frame make.pbalanced
@@ -61,7 +62,8 @@ did_multiplegt_main <- function(
   predict_het,
   trends_lin,
   less_conservative_se,
-  continuous
+  continuous,
+  data_only = FALSE
   ) {
 
 suppressWarnings({
@@ -895,6 +897,13 @@ suppressWarnings({
 
   ## Initialize variable to earmark switchers by the number of the event-study effect
   df$switchers_tag_XX <- NA
+
+  ## Store the data prior to estimation if requested
+  if (isTRUE(data_only)) {
+    data <- list(df,l_XX,T_max_XX)
+    names(data) <- c("df", "l_XX", "T_max_XX")    
+    return(data)
+  }
 
   ## Perform the estimation: call the program did_multiplegt_dyn_core, 
   ## for switchers in and for switchers out, and store the results.

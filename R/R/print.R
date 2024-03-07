@@ -19,7 +19,11 @@ print.did_multiplegt_dyn <- function(x, ...) {
             ref <- x
         } else {
             ref <- x[[paste0("by_level_",b)]]
-            section <- paste(" By",x$args$by, "=", by_levels[b], "###")
+            if (!is.null(x$args[["by"]])) {
+                section <- paste(" By",x$args$by, "=", by_levels[b], "###")
+            } else if (!is.null(x$args[["by_path"]])) {
+                section <- paste0(" By treatment path: (", by_levels[b],") ", "###")
+            }
             cat(noquote(strrep("#", 70 - nchar(section) - 1)));cat(section);
             cat("\n");cat("\n");
         }
