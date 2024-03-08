@@ -27,3 +27,7 @@ First official R release.
 + Added option to compute bootstrap standard errors
 
 + Fixed minor bugs
+
+## Changes in version 1.0.6
+
++ Added by_path option.
