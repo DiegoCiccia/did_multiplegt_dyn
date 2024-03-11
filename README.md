@@ -8,7 +8,7 @@ Estimation in Difference-in-Difference (DID) designs with multiple groups and pe
 ## Short description
 
 Estimation of event-study Difference-in-Difference (DID) estimators in designs with multiple groups and periods, and with a potentially non-binary treatment that may increase 
-or decrease multiple times.  This is a beta version of the command. New options will be added soon, and some of the options already provided are not fully stabilized yet.
+or decrease multiple times.  
 
 ## Setup
 
@@ -19,6 +19,7 @@ ssc install did_multiplegt_dyn, replace
 
 ### R
 ```s
+install.packages("DIDmultiplegtDYN")
 ```
 
 ## Syntax
