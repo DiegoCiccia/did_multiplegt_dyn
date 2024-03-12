@@ -1065,6 +1065,7 @@ did_multiplegt_dyn_core <- function(
           df[[paste0("delta_D_",i,"_temp_XX")]])] <- 0
 
         df[paste0("delta_D_",i,"_XX")] <- sum(df[[paste0("delta_D_",i,"_temp_XX")]], na.rm = TRUE)
+        df[paste0("delta_D_g_",i,"_XX")] <- df[paste0("delta_D_",i,"_temp_XX")] * (get(paste0("N",increase_XX,"_",i,"_XX"))/df$N_gt_XX)
         df <- df %>% dplyr::select(-.data[[paste0("delta_D_",i,"_temp_XX")]])
 
         ## Computing the numerator of U^+_{G,g}: summing up the U_{G,g,l}s, after weighting them

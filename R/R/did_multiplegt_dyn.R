@@ -352,6 +352,6 @@ did_multiplegt_dyn <- function(
     print(did_multiplegt_dyn$plot)
   }
   
-  class(did_multiplegt_dyn) <- c(class(did_multiplegt_dyn), "did_multiplegt_dyn")
+  class(did_multiplegt_dyn) <- "did_multiplegt_dyn"
   return(did_multiplegt_dyn)
 }

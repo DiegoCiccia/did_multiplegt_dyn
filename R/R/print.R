@@ -46,9 +46,11 @@ print.did_multiplegt_dyn <- function(x, ...) {
 
         } else {
             cat(noquote(strrep("-", 70)));cat("\n");
-            cat(strrep(" ", 4));cat("Estimation of treatment effects: ATE per treatment unit");cat("\n");
+            cat(strrep(" ", 4));cat("Average cumulative (total) effect per treatment unit");cat("\n");
             cat(noquote(strrep("-", 70)));cat("\n");
             mat_print(ref$results$ATE)
+            cat(sprintf("Average number of time periods over which a treatment effect is accumulated: %.4f", ref$results$delta_D_avg_total))
+            cat("\n")
         }
         cat("\n")
 

@@ -31,3 +31,9 @@ First official R release.
 ## Changes in version 1.0.6
 
 + Added by_path option.
+
+## Changes in version 1.0.7
+
++ Added average number of cumulative effects
+
++ Added compatibility with rnames to enhance results browsing experience

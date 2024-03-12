@@ -811,6 +811,8 @@ suppressWarnings({
   df[paste0("count", 1:l_XX, "_minus_XX")] <- lapply(1:l_XX, function(i) 0)
   df[paste0("U_Gg_var_", 1:l_XX, "_in_XX")] <- lapply(1:l_XX, function(i) 0)
   df[paste0("U_Gg_var_", 1:l_XX, "_out_XX")] <- lapply(1:l_XX, function(i) 0)
+  df[paste0("delta_D_g_", 1:l_XX, "_plus_XX")] <- lapply(1:l_XX, function(i) 0)
+  df[paste0("delta_D_g_", 1:l_XX, "_minus_XX")] <- lapply(1:l_XX, function(i) 0)
   assign("sum_for_var_in_XX", 0)
   assign("sum_for_var_out_XX", 0)
   inh_obj <- c(inh_obj, "sum_for_var_in_XX", "sum_for_var_out_XX")
@@ -963,6 +965,10 @@ suppressWarnings({
             assign(paste0("delta_D_",i,"_in_XX"), get(paste0("delta_norm_",i,"_XX")))
             const[[paste0("delta_D_",i,"_in_XX")]] <- get(paste0("delta_D_",i,"_in_XX"))
           }
+
+          if (isFALSE(trends_lin)) {
+            df[[paste0("delta_D_g_",i,"_plus_XX")]] <- df[[paste0("delta_D_g_",i,"_XX")]]
+          }
         }
 
       }
@@ -1055,6 +1061,10 @@ suppressWarnings({
           if (normalized == TRUE) {
             assign(paste0("delta_D_",i,"_out_XX"), get(paste0("delta_norm_",i,"_XX")))
             const[[paste0("delta_D_",i,"_out_XX")]] <- get(paste0("delta_D_",i,"_out_XX"))
+          }
+
+          if (isFALSE(trends_lin)) {
+            df[[paste0("delta_D_g_",i,"_minus_XX")]] <- df[[paste0("delta_D_g_",i,"_XX")]]
           }
         }
       }
@@ -1380,6 +1390,29 @@ suppressWarnings({
     }
   }
 
+  ## Average number of cumulated effects 
+  for (i in 1:l_XX) {
+    df[[paste0("delta_D_g_",i,"_XX")]] <- NULL
+  }
+  df$M_g_XX <- ifelse(l_XX <= df$T_g_XX - df$F_g_XX + 1, l_XX, df$T_g_XX - df$F_g_XX + 1)
+
+  #### Calling variables delta_D_g_`i'_XX here like that does not work because switcher in/out are run one after another!!!
+
+  ## second sum over g: total ... if F_g_XX<=T_g_XX
+  ## actually I think it can be done in one total as we sum over the periods within groups and then across groups which are all different cells
+  ## generate one variable that stores all the different delta_D_g_`i'_XX
+
+  df$delta_D_g_XX <- 0
+  for (j in 1:l_XX) {
+    df$delta_D_g_XX_temp <- ifelse(df[[paste0("delta_D_g_",j,"_plus_XX")]] != 0, df[[paste0("delta_D_g_",j,"_plus_XX")]], 
+      df[[paste0("delta_D_g_",j,"_minus_XX")]])
+    df$delta_D_g_XX_temp <- ifelse(df$delta_D_g_XX_temp == 0, NA, df$delta_D_g_XX_temp)
+    df$delta_D_g_XX <- ifelse(df$switchers_tag_XX == j, df$delta_D_g_XX + df$delta_D_g_XX_temp, df$delta_D_g_XX)
+  }
+  df$delta_D_g_num_XX <- df$delta_D_g_XX * (df$M_g_XX - (df$switchers_tag_XX - 1))
+  delta_D_num_total <- sum(df$delta_D_g_num_XX, na.rm = TRUE)
+  delta_D_denom_total <- sum(df$delta_D_g_XX, na.rm = TRUE)
+  delta_D_avg_total <- delta_D_num_total / delta_D_denom_total 
 ###### 6. Computing p-values from the tests 
 
 # If the option cluster is specified, we have previously replaced U_Gg_var_glob_pl_`i'_XX by clust_U_Gg_var_glob_pl_`i'_XX, and U_Gg_var_glob_`i'_XX by clust_U_Gg_var_glob_`i'_XX. 
@@ -1655,12 +1688,13 @@ ATE_mat <- matrix(mat_res_XX[l_XX + 1, 1:(ncol(mat_res_XX) -1)], ncol = ncol(mat
 rownames(ATE_mat) <- rownames[l_XX+1]
 colnames(ATE_mat) <- c("Estimate", "SE", "LB CI", "UB CI", "N", "Switchers")
 
-out_names <- c("N_Effects", "N_Placebos", "Effects", "ATE")
+out_names <- c("N_Effects", "N_Placebos", "Effects", "ATE", "delta_D_avg_total")
 did_multiplegt_dyn <- list(
   l_XX,
   l_placebo_XX,
   Effect_mat,
-  ATE_mat
+  ATE_mat,
+  delta_D_avg_total
 )
 if (isTRUE(effects_equal)) {
   did_multiplegt_dyn <- append(did_multiplegt_dyn, p_equality_effects)
