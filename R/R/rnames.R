@@ -7,7 +7,7 @@
 #' @import rnames
 #' @returns The same output as rnames.
 #' @export
-rnames.did_multiplegt_dyn <- function(obj, ignore = c("by_fd_graph", "by_graph", "args"), ...) {
+rnames.did_multiplegt_dyn <- function(obj, ignore = c("plot", "args"), ...) {
     class(obj) <- "list"
     return(rnames(obj = obj, ignore = c("plot", "args")))
 }
