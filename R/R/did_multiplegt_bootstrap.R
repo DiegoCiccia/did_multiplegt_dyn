@@ -104,7 +104,7 @@ did_multiplegt_bootstrap <- function(
             }
         }
         res <- df_est <- NULL
-        progressBar(j)
+        progressBar(j, bootstrap)
     }
 
     ci_level <- ci_level / 100
