@@ -72,7 +72,7 @@ did_multiplegt_dyn_dfs <- function(
       if (by_index != "_no_by") {
         by_add <- paste0(", ",abbreviate(by,5), "=", by_index)
       }
-      message("Save to excel option shut down due to dependencies issues (library 'xlsx').")
+      message("Save to excel option shut down due to dependencies issues (library 'xlsx'). See the Disclaimer section of the manual for further information.")
       #write.xlsx(dfsmat, dfs_path, row.names = TRUE, col.names = TRUE, 
           #sheetName = paste0("Switch. Dates",by_add), append = append)
     }
@@ -134,7 +134,7 @@ did_multiplegt_dyn_dfs <- function(
 		  ## output as excel
       if (dfs_path != "console") {
         sheetn <- paste0("Base treat. ", l)
-        message("Save to excel option shut down due to dependencies issues (library 'xlsx').")
+        message("Save to excel option shut down due to dependencies issues (library 'xlsx'). See the Disclaimer section of the manual for further information.")
         #write.xlsx(dfsmat, dfs_path, row.names = TRUE, col.names = TRUE, sheetName = paste0(sheetn, by_add), append = append)
         append <- TRUE
       }

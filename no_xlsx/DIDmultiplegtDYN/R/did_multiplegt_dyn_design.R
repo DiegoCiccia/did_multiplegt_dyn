@@ -132,7 +132,7 @@ did_multiplegt_dyn_design <- function(
       if (by_index != "_no_by") {
         by_add <- paste0(", ",abbreviate(by,5), "=", by_index)
       }
-      message("Save to excel option shut down due to dependencies issues (library 'xlsx').")
+      message("Save to excel option shut down due to dependencies issues (library 'xlsx'). See the Disclaimer section of the manual for further information.")
       #write.xlsx(desmat, des_path, row.names = TRUE, col.names = TRUE, 
           #sheetName = paste0("Design",by_add), append = append)
   }
