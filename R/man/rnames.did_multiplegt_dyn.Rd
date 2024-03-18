@@ -4,7 +4,7 @@
 \alias{rnames.did_multiplegt_dyn}
 \title{rnames method for did_multiplegt_dyn}
 \usage{
-\method{rnames}{did_multiplegt_dyn}(obj, ignore = c("by_fd_graph", "by_graph", "args"), ...)
+\method{rnames}{did_multiplegt_dyn}(obj, ignore = c("plot", "args"), ...)
 }
 \arguments{
 \item{obj}{A did_multiplegt_dyn object}
