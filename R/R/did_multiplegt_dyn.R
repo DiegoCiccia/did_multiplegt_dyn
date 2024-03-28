@@ -34,6 +34,7 @@
 #' @param drop_if_d_miss_before_first_switch (logical) This option is relevant when the treatment of some groups is missing at some time periods. Then, the command imputes some of those missing treatments. Those imputations are detailed in Appendix A of de Chaisemartin et al (2024). In designs where groups' treatments can change at most once, all those imputations are justified by the design. In other designs, some of those imputations may be liberal. drop_if_d_miss_before_first_switch can be used to overrule the potentially liberal imputations that are not innocuous for the non-normalized event-study estimators. See Appendix A of de Chaisemartin et al (2024) for further details.
 #' @param bootstrap (integer) This option allows to bootstrap the standard errors of the estimated coefficients. The integer argument is the number of bootstrap replications.
 #' @param by_path (integer) by_path
+#' @param timer timer
 #' @section Overview:
 #' \code{did_multiplegt_dyn()} estimates the effect of a treatment on an outcome, using group-(e.g. county- or state-) level panel data. The panel may be unbalanced: not all groups have to be observed at every period. The data may also be at a more disaggregated level than the group level (e.g. individual-level wage data to measure the effect of a regional-level minimum-wage on individuals' wages). The command computes the DID event-study estimators introduced in de Chaisemartin and D'Haultfoeuille (2024). It can be used with a binary and absorbing (staggered) treatment but it can also be used with a non-binary treatment (discrete or continuous) that can increase or decrease multiple times, even if lagged treatments affect the outcome, and if the current and lagged treatments have heterogeneous effects, across space and/or over time. The event-study estimators computed by the command rely on a no-anticipation and parallel trends assumptions.
 #' 
@@ -168,8 +169,15 @@ did_multiplegt_dyn <- function(
     dont_drop_larger_lower = FALSE, 
     drop_if_d_miss_before_first_switch = FALSE,
     bootstrap = NULL,
-    by_path = NULL
+    by_path = NULL, 
+    timer = FALSE
     ) { 
+  
+  timer_list <- NULL
+  if (isTRUE(timer)) {
+    timer_list <- list()
+    timer_list$start <- Sys.time()
+  }
 
   #### General syntax checks ####
   params <- as.list(match.call())[-1]
@@ -272,6 +280,10 @@ did_multiplegt_dyn <- function(
   ## - if the option is not specified, the output is an object with just one "results" branch.
   ## - if the option is specified, the output takes on as many branches as the levels of the by variable
 
+  if (isTRUE(timer)) {
+    timer_list$intro <- Sys.time()
+  }
+
   append_design <- FALSE
   append_dfs <- FALSE
   for (b in 1:length(by_levels)) {
@@ -290,10 +302,17 @@ did_multiplegt_dyn <- function(
       df_main <- df
     }
 
-    df_est <- did_multiplegt_main(df = df_main, outcome = outcome, group =  group, time =  time, treatment = treatment, effects = effects, placebo = placebo, ci_level = ci_level,switchers = switchers, trends_nonparam = trends_nonparam, weight = weight, controls = controls, dont_drop_larger_lower = dont_drop_larger_lower, drop_if_d_miss_before_first_switch = drop_if_d_miss_before_first_switch, cluster = cluster, same_switchers = same_switchers, same_switchers_pl = same_switchers_pl, effects_equal = effects_equal, save_results = save_results, normalized = normalized, predict_het = predict_het, trends_lin = trends_lin, less_conservative_se = less_conservative_se, continuous = continuous)
+    df_est <- did_multiplegt_main(df = df_main, outcome = outcome, group =  group, time =  time, treatment = treatment, effects = effects, placebo = placebo, ci_level = ci_level,switchers = switchers, trends_nonparam = trends_nonparam, weight = weight, controls = controls, dont_drop_larger_lower = dont_drop_larger_lower, drop_if_d_miss_before_first_switch = drop_if_d_miss_before_first_switch, cluster = cluster, same_switchers = same_switchers, same_switchers_pl = same_switchers_pl, effects_equal = effects_equal, save_results = save_results, normalized = normalized, predict_het = predict_het, trends_lin = trends_lin, less_conservative_se = less_conservative_se, continuous = continuous, timer = timer_list)
 
     temp_obj <- list(df_est$did_multiplegt_dyn)
     names(temp_obj)[length(temp_obj)] <- "results"
+
+    if (isTRUE(timer)) {
+      timer_list <- df_est$timer_list
+      if (by_levels[b] != "_no_by") {
+        names(timer_list)[(length(timer_list)-2):length(timer_list)] <- sapply(c("pre", "post", "end"), function(x) paste0("by",by_levels[b],"_", x,"_estimation"))
+      }
+    }
 
     if (!is.null(bootstrap)) {
       message(sprintf("\nBootstrap, %.0f reps:", bootstrap))
@@ -354,7 +373,17 @@ did_multiplegt_dyn <- function(
   if (isFALSE(graph_off)) {
     print(did_multiplegt_dyn$plot)
   }
-  
+
+  if (isTRUE(timer)) {
+    timer_list$end <- Sys.time()
+    timer_res <- matrix(NA, nrow = length(timer_list) -1, ncol = 1)
+    rownames(timer_res) <- names(timer_list)[2:length(timer_list)]
+    for (j in 1:(length(timer_list)-1)) {
+        timer_res[j, 1] <- difftime(as.POSIXct(timer_list[[j+1]]), as.POSIXct(timer_list[[j]]))
+    }
+    did_multiplegt_dyn <- append(did_multiplegt_dyn, list(timer_res))
+    names(did_multiplegt_dyn)[length(did_multiplegt_dyn)] <- "timestamps"
+  }  
   class(did_multiplegt_dyn) <- "did_multiplegt_dyn"
   return(did_multiplegt_dyn)
 }

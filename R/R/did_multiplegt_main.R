@@ -24,6 +24,7 @@
 #' @param less_conservative_se less_conservative_se
 #' @param continuous continuous
 #' @param data_only data_only
+#' @param timer timer
 #' @import dplyr
 #' @importFrom matlib Ginv 
 #' @importFrom plm pdata.frame make.pbalanced
@@ -63,7 +64,8 @@ did_multiplegt_main <- function(
   trends_lin,
   less_conservative_se,
   continuous,
-  data_only = FALSE
+  data_only = FALSE,
+  timer
   ) {
 
 suppressWarnings({
@@ -906,6 +908,9 @@ suppressWarnings({
     names(data) <- c("df", "l_XX", "T_max_XX")    
     return(data)
   }
+  if (!is.null(timer)) {
+    timer$pre_estimation <- Sys.time()
+  }
 
   ## Perform the estimation: call the program did_multiplegt_dyn_core, 
   ## for switchers in and for switchers out, and store the results.
@@ -1108,6 +1113,9 @@ suppressWarnings({
     }
   }
   rownames <- c()
+  if (!is.null(timer)) {
+    timer$post_estimation <- Sys.time()
+  }
 
   ###### 5. Computing the estimators and their variances
 
@@ -1734,6 +1742,7 @@ if (isTRUE(normalized)) {
   }
 }
 
+
 ret <- list(
   df,
   did_multiplegt_dyn,
@@ -1746,6 +1755,11 @@ ret_names <- c("df", "did_multiplegt_dyn", "delta", "l_XX", "T_max_XX", "mat_res
 if (placebo!= 0) {
   ret <- append(ret, l_placebo_XX)
   ret_names <- c(ret_names, "l_placebo_XX")
+}
+if (!is.null(timer)) {
+  timer$end_estimation <- Sys.time()
+  ret <- append(ret, list(timer))
+  ret_names <- c(ret_names, "timer_list")
 }
 names(ret) <- ret_names
 ret
